@@ -26,6 +26,7 @@
     <None Include="d3d9.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logger.h">
