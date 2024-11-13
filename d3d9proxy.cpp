@@ -17,9 +17,6 @@ Direct3DCreate9_t originalDirect3DCreate9 = nullptr;
 typedef HRESULT(__stdcall* SetViewport_t)(IDirect3DDevice9*, const D3DVIEWPORT9*);
 SetViewport_t originalSetViewport = nullptr;
 
-typedef HRESULT(__stdcall* CreateDevice_t)(IDirect3D9*, UINT, D3DDEVTYPE, HWND, DWORD, D3DPRESENT_PARAMETERS*, IDirect3DDevice9**);
-CreateDevice_t originalCreateDevice = nullptr;
-
 std::mutex hookMutex;
 
 HRESULT __stdcall SetViewportHook(IDirect3DDevice9* pDevice, const D3DVIEWPORT9* pViewport) {
@@ -29,6 +26,7 @@ HRESULT __stdcall SetViewportHook(IDirect3DDevice9* pDevice, const D3DVIEWPORT9*
 	D3DVIEWPORT9 modifiedViewport = *pViewport;
 	modifiedViewport.X = 0;
 	modifiedViewport.Y = 0;
+	// need to get original width and height
 	modifiedViewport.Width = 3440;
 	modifiedViewport.Height = 1440;
 	modifiedViewport.MinZ = 0.0f;
@@ -39,7 +37,6 @@ HRESULT __stdcall SetViewportHook(IDirect3DDevice9* pDevice, const D3DVIEWPORT9*
 	return originalSetViewport(pDevice, &modifiedViewport);
 }
 
-// function to hook SetViewport
 void HookSetViewport(IDirect3DDevice9* pDevice) {
 	Logger::getInstance().log("HookSetViewport called");
 	// Get the vtable of the IDirect3DDevice9 interface
