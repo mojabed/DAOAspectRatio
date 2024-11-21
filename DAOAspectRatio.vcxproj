@@ -145,7 +145,6 @@
   <ItemGroup>
     <ClCompile Include="d3d9proxy.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="hooks.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="overrides.cpp" />
   </ItemGroup>
