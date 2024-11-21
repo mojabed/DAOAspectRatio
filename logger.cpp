@@ -51,12 +51,9 @@ void Logger::logError(const std::string& message, const std::source_location& lo
 		    << message << ":: " << lastErrorAsString << std::endl;
 }
 
-void Logger::log(const std::string& message, const std::source_location& location) const {
+void Logger::log(const std::string& message) const {
 	timestamp(logFile);
-	logFile << location.file_name() << '('
-		    << location.line() << ") '"
-		    << location.function_name() << "': "
-		    << message << std::endl;
+	logFile << message << std::endl;
 }
 
 Logger::Logger() {

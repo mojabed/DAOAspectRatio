@@ -1,4 +1,3 @@
 LIBRARY d3d9
 EXPORTS
-    Direct3DCreate9=Direct3DCreate9Hook
-    ?SetViewport@IDirect3DDevice9@@UAGJPBU_D3DVIEWPORT9@@@Z=SetViewportHook
+    Direct3DCreate9

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <source_location>
 #include <mutex>
+#include <format>
 
 class Logger {
 public:
@@ -15,8 +16,7 @@ public:
 
     void logError(const std::string& message,
                   const std::source_location& location = std::source_location::current()) const;
-    void log(const std::string& message,
-                  const std::source_location& location = std::source_location::current()) const;
+    void log(const std::string& message) const;
 
 private:
     Logger(const Logger&) = delete;
