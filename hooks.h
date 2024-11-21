@@ -39,7 +39,7 @@ template<typename T>
 bool HookManager<T>::apply() {
     //std::lock_guard<std::mutex> lock(hookMutex);
     bool success = true;
-	Logger::getInstance().log("Hooking function");
+    Logger::getInstance().log("Hooking function");
 
     if (!vtable || !hookFunc) {
         Logger::getInstance().logError("Invalid vtable or hook function");

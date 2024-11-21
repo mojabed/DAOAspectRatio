@@ -24,10 +24,10 @@ CustomDirect3D9::~CustomDirect3D9() {
 HRESULT __stdcall CustomDirect3D9::SetViewportHook(IDirect3DDevice9* pDevice, const D3DVIEWPORT9* pViewport) {
     std::lock_guard<std::mutex> lock(hookMutex);
 
-	// Modify viewport only when the game attempts to draw letterboxes (X = 440 at 3440x1440)
+    // Modify viewport only when the game attempts to draw letterboxes (X = 440 at 3440x1440)
     if (pViewport->X == 440 && pViewport->Width != CustomDirect3D9::getInstance().m_viewport.Width) { // probably need to adjust X == 440 to account for larger displays
-		pViewport = &CustomDirect3D9::getInstance().m_viewport;
-		CustomDirect3D9::getInstance().setViewportFlag = true;
+        pViewport = &CustomDirect3D9::getInstance().m_viewport;
+        CustomDirect3D9::getInstance().setViewportFlag = true;
         return CustomDirect3D9::getInstance().originalSetViewport(pDevice, pViewport);
 
         int nScreenWidth, nScreenHeight;
@@ -36,8 +36,8 @@ HRESULT __stdcall CustomDirect3D9::SetViewportHook(IDirect3DDevice9* pDevice, co
         D3DVIEWPORT9 vp = { (nScreenWidth - 1024) / 2,(nScreenHeight - 768) / 2,1024,768,0,1 };
         pDevice->SetViewport(&vp);
     }
-	CustomDirect3D9::getInstance().setViewportFlag = false;
-	// Call the original SetViewport function
+    CustomDirect3D9::getInstance().setViewportFlag = false;
+    // Call the original SetViewport function
     return CustomDirect3D9::getInstance().originalSetViewport(pDevice, pViewport);
 }
 
@@ -70,16 +70,16 @@ D3DMATRIX CreateProjectionMatrix(float fov, float aspectRatio, float nearPlane, 
 
 // Intercepted SetTransform
 HRESULT __stdcall CustomDirect3D9::SetTransformHook(IDirect3DDevice9* pDevice, D3DTRANSFORMSTATETYPE state, const D3DMATRIX* matrix) {
-	std::lock_guard<std::mutex> lock(hookMutex);
+    std::lock_guard<std::mutex> lock(hookMutex);
 
-	if (state == D3DTS_PROJECTION && CustomDirect3D9::getInstance().setViewportFlag) {
+    if (state == D3DTS_PROJECTION && CustomDirect3D9::getInstance().setViewportFlag) {
 
         //float modifiedFOV = D3DX_PI / 2; // 90 degrees field of view
 
         //float nearPlane = //matrix->_43 / (matrix->_33 - 1.0f);
         //float farPlane = //matrix->_43 / (matrix->_33 + 1.0f);
 
-		//D3DMATRIX projectionMatrix = CreateProjectionMatrix(modifiedFOV, aspectRatio, nearPlane, farPlane);
+        //D3DMATRIX projectionMatrix = CreateProjectionMatrix(modifiedFOV, aspectRatio, nearPlane, farPlane);
 
         D3DMATRIX modifiedMatrix = *matrix;
 
@@ -92,11 +92,11 @@ HRESULT __stdcall CustomDirect3D9::SetTransformHook(IDirect3DDevice9* pDevice, D
         modifiedMatrix._22 = matrix->_22;
 
         // Log the modified matrix
-		Logger::getInstance().log("Modified projection matrix");
+        Logger::getInstance().log("Modified projection matrix");
         LogMatrix(modifiedMatrix);
         //return CustomDirect3D9::getInstance().originalSetTransform(pDevice, state, &modifiedMatrix);
-	}
-	return CustomDirect3D9::getInstance().originalSetTransform(pDevice, state, matrix);
+    }
+    return CustomDirect3D9::getInstance().originalSetTransform(pDevice, state, matrix);
 }
 
 void CustomDirect3D9::HookSetViewport(IDirect3DDevice9* pDevice) {
@@ -118,21 +118,21 @@ void CustomDirect3D9::HookSetViewport(IDirect3DDevice9* pDevice) {
 }
 
 void CustomDirect3D9::HookSetTransform(IDirect3DDevice9* pDevice) {
-	void** vtable = *reinterpret_cast<void***>(pDevice);
-	if (!vtable) {
-		Logger::getInstance().logError("Failed to get vtable of IDirect3DDevice9");
-		return;
-	}
+    void** vtable = *reinterpret_cast<void***>(pDevice);
+    if (!vtable) {
+        Logger::getInstance().logError("Failed to get vtable of IDirect3DDevice9");
+        return;
+    }
 
-	HookManager<SetTransform_t> hook(vtable, 44, SetTransformHook);
+    HookManager<SetTransform_t> hook(vtable, 44, SetTransformHook);
 
-	if (hook.apply()) {
-		originalSetTransform = hook.getOriginal();
-		Logger::getInstance().log("SetTransform hooked successfully");
-	}
-	else {
-		Logger::getInstance().logError("Failed to hook SetTransform");
-	}
+    if (hook.apply()) {
+        originalSetTransform = hook.getOriginal();
+        Logger::getInstance().log("SetTransform hooked successfully");
+    }
+    else {
+        Logger::getInstance().logError("Failed to hook SetTransform");
+    }
 }
 
 HRESULT CustomDirect3D9::CreateDevice(
@@ -143,13 +143,13 @@ HRESULT CustomDirect3D9::CreateDevice(
     D3DPRESENT_PARAMETERS* pPresentationParameters,
     IDirect3DDevice9** ppReturnedDeviceInterface) {
 
-	//std::lock_guard<std::mutex> lock(hookMutex);
+    //std::lock_guard<std::mutex> lock(hookMutex);
     Logger::getInstance().log("Calling original CreateDevice");
     HRESULT hr = m_original->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     if (SUCCEEDED(hr)) {
-		Logger::getInstance().log("CreateDevice successful");
+        Logger::getInstance().log("CreateDevice successful");
 
-		m_device = *ppReturnedDeviceInterface;
+        m_device = *ppReturnedDeviceInterface;
         if (m_device) {
             HRESULT hr = m_device->GetViewport(&m_viewport);
             if (FAILED(hr)) {
@@ -157,12 +157,12 @@ HRESULT CustomDirect3D9::CreateDevice(
                 return hr;
             }
             aspectRatio = static_cast<float>(m_viewport.Width) / static_cast<float>(m_viewport.Height);
-			// Hook the functions of interest
-			HookSetViewport(m_device);
-			HookSetTransform(m_device);
+            // Hook the functions of interest
+            HookSetViewport(m_device);
+            HookSetTransform(m_device);
         }
         else {
-			Logger::getInstance().logError("Failed to get device pointer");
+            Logger::getInstance().logError("Failed to get device pointer");
         }
     }
     return hr;

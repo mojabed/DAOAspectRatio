@@ -9,7 +9,7 @@ class CustomDirect3D9 : public IDirect3D9 {
 public:
     ~CustomDirect3D9();
     using SetViewport_t = HRESULT(__stdcall*)(IDirect3DDevice9*, const D3DVIEWPORT9*);
-	using SetTransform_t = HRESULT(__stdcall*)(IDirect3DDevice9*, D3DTRANSFORMSTATETYPE, const D3DMATRIX*);
+    using SetTransform_t = HRESULT(__stdcall*)(IDirect3DDevice9*, D3DTRANSFORMSTATETYPE, const D3DMATRIX*);
 
     static CustomDirect3D9& getInstance(IDirect3D9* original = nullptr) {
         static std::once_flag flag;
@@ -24,10 +24,10 @@ public:
 
     // Hooked functions
     static HRESULT __stdcall SetViewportHook(IDirect3DDevice9* device, const D3DVIEWPORT9* pViewport);
-	static HRESULT __stdcall SetTransformHook(IDirect3DDevice9* device, D3DTRANSFORMSTATETYPE state, const D3DMATRIX* matrix);
+    static HRESULT __stdcall SetTransformHook(IDirect3DDevice9* device, D3DTRANSFORMSTATETYPE state, const D3DMATRIX* matrix);
 
     void HookSetViewport(IDirect3DDevice9* pDevice);
-	void HookSetTransform(IDirect3DDevice9* pDevice);
+    void HookSetTransform(IDirect3DDevice9* pDevice);
 
     IDirect3D9* GetOriginal() const { return m_original; }
     IDirect3DDevice9* GetDevice() const { return m_device; }
@@ -63,11 +63,11 @@ private:
     CustomDirect3D9(IDirect3D9* original) : m_original(original), aspectRatio(1.0f), m_viewport{} {}
 
     IDirect3D9* m_original;
-	IDirect3DDevice9* m_device = nullptr;
+    IDirect3DDevice9* m_device = nullptr;
     D3DVIEWPORT9 m_viewport;
 
     SetViewport_t originalSetViewport = nullptr;
-	SetTransform_t originalSetTransform = nullptr;
+    SetTransform_t originalSetTransform = nullptr;
 
     static std::unique_ptr<CustomDirect3D9> instance;
 
